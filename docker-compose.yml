@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: fraud_postgres
+    environment:
+      POSTGRES_DB: fraud_detection
+      POSTGRES_USER: ds_user
+      POSTGRES_PASSWORD: ds_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data:/data
+      - ./postgres/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - fraud_network
+
+volumes:
+  postgres_data:
+
+networks:
+  fraud_network:
