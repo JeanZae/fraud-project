@@ -4,20 +4,26 @@ services:
   fraud-app:
     build:
       context: .
-    container_name: fraud-app
+    #container_name: fraud-app
 
     environment:
       DB_HOST: db
       DB_PORT: 5432 
-      POSTGRES_PASSWORD: ${DB_PWD}
-      POSTGRES_USER: ${DB_USR_NAME}
-      POSTGRES_DB: ${DB_NAME}
+      # POSTGRES_PASSWORD: ${DB_PWD}
+      # POSTGRES_USER: ${DB_USR_NAME}
+      # POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "fraud_db"
 
     volumes:
       - ./outputs:/outputs
       - ./data:/data
 
     working_dir: /app
+
+    env_file:
+      - .env
 
     user: "${UID:-1000}:${GID:-1000}" # no root
 

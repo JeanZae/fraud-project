@@ -2,6 +2,9 @@ import pandas as pd
 import glob
 import os
 from reportclass import SimpleReport
+from loader import load_data
+
+load_data()
 
 report1=SimpleReport(file_path="/outputs/report1.html")
 

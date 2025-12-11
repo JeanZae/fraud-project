@@ -21,3 +21,5 @@ docker.log
 # 2. Зависят от системы
 __pycache__/
 *.pyc
+
+postgres_data/
