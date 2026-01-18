@@ -2,9 +2,10 @@ import pandas as pd
 import glob
 import os
 from reportclass import SimpleReport
-from loader import load_data
+from loader import load_data, load_ps2
 
-load_data()
+# load_data()
+load_ps2()
 
 report1=SimpleReport(file_path="/outputs/report1.html")
 
