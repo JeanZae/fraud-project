@@ -31,7 +31,8 @@ class SimpleReport:
         if title:
             self.content.append(f"<h3>{title}</h3>")
         self.content.append(f'<img src="data:image/png;base64,{image_base64}" width="600">')
-        
+        plt.close()
+
     def save(self):
         """Сохраняет весь отчет в файл"""
         html_content = f"""

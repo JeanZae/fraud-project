@@ -236,5 +236,56 @@ def load_csv_data(cursor, csv_path: str):
     print("Данные загружены через COPY")
 
 
-if __name__ == '__main__':
-    load_data()
+def load_to_parquet():
+    cache_path = '/data/cache/transactions.parquet'
+    if os.path.exists(cache_path):
+        print("Загрузка из кэша...")
+        try:
+            df = pd.read_parquet(cache_path)
+            # Проверяем, что это не None и не пустой DataFrame
+            if df is None:
+                raise ValueError("pd.read_parquet вернул None")
+            if df.empty:
+                print("Кэш содержит пустой DataFrame. Удаляем и загружаем заново.")
+                os.remove(cache_path)
+            else:
+                print(f"Кэш загружен, форма: {df.shape}")
+                return df
+        except Exception as e:
+            print(f"Ошибка чтения кэша: {e}. Удаляем повреждённый файл.")
+            try:
+                os.remove(cache_path)
+            except OSError:
+                pass
+    
+    # загружаем из БД
+    print("Загрузка из БД...")
+
+    DB_USR_NAME = os.getenv('DB_USR_NAME')
+    DB_PWD = os.getenv('DB_PWD')
+    DB_NAME = os.getenv('DB_NAME')
+    DB_HOST = os.getenv('DB_HOST', 'db')
+    DB_PORT = os.getenv('DB_PORT', '5432')
+    CSV_PATH = os.getenv('CSV_PATH')
+
+    print("🔗 Подключаемся к базе данных...")
+
+    conn = psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USR_NAME,
+        password=DB_PWD,
+        host=DB_HOST,
+        port=DB_PORT,
+        connect_timeout=10,
+        # client_encoding='utf8',
+        application_name='data_loader'  # Имя приложения в pg_stat_activity
+    )
+
+    df = pd.read_sql('SELECT * FROM transactions', conn)
+    conn.close()
+
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    df.to_parquet(cache_path, engine='pyarrow')
+    print(f"Данные закэшированы в {cache_path}")
+    
+    return df
